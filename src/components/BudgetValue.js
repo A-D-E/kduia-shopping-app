@@ -10,10 +10,12 @@ const BudgetValue = () => {
   const [budget, setBudget] = useState(initialState.Budget)
   const handleBudget = (event) => {
     setBudget(parseInt(event.target.value))
-
+    if (event.target.value < totalExpenses) {
+      return alert('You cann not reduce the budget value than the spending')
+    }
     dispatch({
       type: 'ADD_TOTAL_BUDGET',
-      payload: budget,
+      payload: parseInt(event.target.value),
     })
   }
   return (
@@ -35,6 +37,8 @@ const BudgetValue = () => {
               type='number'
               value={budget}
               onChange={handleBudget}
+              min={0}
+              max={20000}
               step={10}
             />
           </div>

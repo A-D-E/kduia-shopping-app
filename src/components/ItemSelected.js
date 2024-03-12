@@ -2,16 +2,16 @@ import React, { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { initialState } from '../context/AppContext'
 const ItemSelected = (props) => {
-  const { dispatch, Currency } = useContext(AppContext)
-
+  const { dispatch, Currency, totalRemaining, budget, totalExpenses } =
+    useContext(AppContext)
   const [name, setName] = useState('')
-  const [budget, setQuantity] = useState('')
+  const [itemBudget, setQuantity] = useState('')
   const [action, setAction] = useState('')
 
   const submitEvent = () => {
     const item = {
       name: name,
-      budget: parseInt(budget),
+      budget: parseInt(itemBudget),
     }
 
     if (action === 'Reduce') {
@@ -20,6 +20,24 @@ const ItemSelected = (props) => {
         payload: item,
       })
     } else {
+      if (budget !== 20000) {
+        if (totalRemaining < parseInt(itemBudget)) {
+          alert(
+            `Budget Exceeded. You still have ${totalRemaining} ${Currency} available.`
+          )
+          setQuantity(totalRemaining)
+          return
+        }
+      } else if (budget === 20000 && budget < totalRemaining + itemBudget) {
+        alert(
+          `Budget Exceeded. ${
+            parseInt(budget) - totalExpenses
+          } ${Currency} remain.`
+        )
+        setQuantity(totalRemaining)
+        return
+      }
+
       dispatch({
         type: 'ADD_BUDGET',
         payload: item,
@@ -53,37 +71,6 @@ const ItemSelected = (props) => {
               {item.name}
             </option>
           ))}
-          {/* <option
-              value='Shirt'
-              name='Shirt'
-            >
-              {' '}
-              Shirt
-            </option>
-            <option
-              value='Dress'
-              name='Dress'
-            >
-              Dress
-            </option>
-            <option
-              value='Jeans'
-              name='Jeans'
-            >
-              Jeans
-            </option>
-            <option
-              value='Dinner set'
-              name='Dinner set'
-            >
-              Dinner set
-            </option>
-            <option
-              value='Bags'
-              name='Bags'
-            >
-              Bags
-            </option> */}
         </select>
       </div>
       <div
@@ -132,7 +119,7 @@ const ItemSelected = (props) => {
           required='required'
           type='number'
           id='cost'
-          value={budget}
+          value={itemBudget}
           style={{ size: 10 }}
           aria-label='cost'
           onChange={(event) => setQuantity(event.target.value)}
@@ -146,6 +133,7 @@ const ItemSelected = (props) => {
           className='btn btn-primary'
           onClick={submitEvent}
           style={{ marginLeft: '2rem' }}
+          disabled={totalRemaining === 0 || name === '' || budget === 0}
         >
           Save
         </button>

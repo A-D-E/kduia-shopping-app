@@ -2,7 +2,7 @@ import React, { createContext, useReducer } from 'react'
 
 // 5. The reducer - this is used to update the state, based on the action
 export const AppReducer = (state, action) => {
-  let new_expenses = []
+  let new_expenses
 
   switch (action.type) {
     case 'ADD_TOTAL_BUDGET':
@@ -11,78 +11,68 @@ export const AppReducer = (state, action) => {
         Budget: +action.payload,
       }
     case 'ADD_BUDGET':
-      state.expenses.map((expense) => {
-        if (expense.name === action.payload.name) {
-          expense.budget = expense.budget + action.payload.budget
-        }
-        new_expenses.push(expense)
-        return true
-      })
-      state.expenses = new_expenses
-      action.type = 'DONE'
+      new_expenses = state.expenses.map((expense) =>
+        expense.name === action.payload.name
+          ? { ...expense, budget: expense.budget + action.payload.budget }
+          : expense
+      )
       return {
         ...state,
+        expenses: new_expenses,
       }
 
     case 'REDUCE_BUDGET':
-      state.expenses.map((expense) => {
+      new_expenses = state.expenses.map((expense) => {
         if (expense.name === action.payload.name) {
-          expense.budget = expense.budget - action.payload.budget
+          return {
+            ...expense,
+            budget: Math.max(0, expense.budget - action.payload.budget),
+          }
         }
-        expense.budget = expense.budget < 0 ? 0 : expense.budget
-        new_expenses.push(expense)
-        return true
+        return expense
       })
-      state.expenses = new_expenses
-      action.type = 'DONE'
       return {
         ...state,
+        expenses: new_expenses,
       }
+
     case 'INCREASE_ITEM':
-      state.expenses.map((expense) => {
-        if (expense.name === action.payload.name) {
-          expense.budget = expense.budget + 10
-        }
-        new_expenses.push(expense)
-        return true
-      })
-      state.expenses = new_expenses
-      action.type = 'DONE'
+      new_expenses = state.expenses.map((expense) =>
+        expense.name === action.payload.name
+          ? { ...expense, budget: expense.budget + 10 }
+          : expense
+      )
       return {
         ...state,
+        expenses: new_expenses,
       }
+
     case 'DECREASE_ITEM':
-      state.expenses.map((expense) => {
-        if (expense.name === action.payload.name) {
-          expense.budget = expense.budget - 10
-        }
-        expense.budget = expense.budget < 0 ? 0 : expense.budget
-        new_expenses.push(expense)
-        return true
-      })
-      state.expenses = new_expenses
-      action.type = 'DONE'
+      new_expenses = state.expenses.map((expense) =>
+        expense.name === action.payload.name
+          ? { ...expense, budget: Math.max(0, expense.budget - 10) }
+          : expense
+      )
       return {
         ...state,
+        expenses: new_expenses,
       }
+
     case 'DELETE_ITEM':
-      state.expenses.map((expense) => {
-        if (expense.name === action.payload.name) {
-          expense.budget = 0
-        }
-        new_expenses.push(expense)
-        return true
-      })
-      state.expenses = new_expenses
-      action.type = 'DONE'
+      new_expenses = state.expenses.map((expense) =>
+        expense.name === action.payload.name
+          ? { ...expense, budget: 0 }
+          : expense
+      )
       return {
         ...state,
+        expenses: new_expenses,
       }
+
     case 'CHG_LOCATION':
-      action.type = 'DONE'
-      state.Currency = action.payload
       return {
         ...state,
+        Currency: action.payload,
       }
 
     default:
@@ -125,6 +115,8 @@ export const AppProvider = (props) => {
     <AppContext.Provider
       value={{
         expenses: state.expenses,
+        totalExpenses,
+        totalRemaining: state.Budget - totalExpenses,
         budget: state.Budget,
         dispatch,
         Currency: state.Currency,
