@@ -9,10 +9,10 @@ const ExpenseList = () => {
     <table className='table'>
       <thead className='thead-light'>
         <tr>
-          <th scope='col'>Items</th>
-          <th scope='col'>Quantity</th>
-          <th scope='col'>Unit Price</th>
-          <th scope='col'>Items Price</th>
+          <th scope='col'>Department</th>
+          <th scope='col'>Allocated budget</th>
+          <th scope='col'>Incrase by 10</th>
+          <th scope='col'>Decrease by 10</th>
           <th scope='col'>Remove</th>
         </tr>
       </thead>
@@ -22,8 +22,7 @@ const ExpenseList = () => {
             id={expense.id}
             key={expense.id}
             name={expense.name}
-            quantity={expense.quantity}
-            unitprice={expense.unitprice}
+            budget={expense.budget}
           />
         ))}
       </tbody>
